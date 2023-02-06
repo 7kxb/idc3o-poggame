@@ -1,0 +1,144 @@
+import pygame                                                       # imports pygame
+import os                                                           # imports os
+import sys                                                          # imports sys
+sys.path.insert(0,os.path.join('3 - pong','logic','multiplayer'))   # imports logic
+pygame.display.set_caption('pongame')                               # sets display caption to pongame
+
+def main():
+    import define                                                   # imports define
+    WIDTH,HEIGHT,WIN,WHITE,BLACK,YELLOW,RED,BORDER,HEALTH_FONT,POWER_FONT,WINNER_FONT,BULLET_HIT_SOUND,BULLET_FIRE_SOUND,BOUNCE_SOUND,ROUND_SOUND,SAGE_WALL,MUSIC,FPS,VEL,BULLET_VEL,MAX_BULLETS,YELLOW_HIT,RED_HIT,YELLOW_POINT,RED_POINT,SPACESHIP_WIDTH,SPACESHIP_HEIGHT,YELLOW_SPACESHIP_IMAGE,YELLOW_SPACESHIP,RED_SPACESHIP_IMAGE,RED_SPACESHIP,SPACE,RED_ROCKET_IMAGE,RED_ROCKET,YELLOW_ROCKET_IMAGE,YELLOW_ROCKET,EXPLOSION_IMAGE,EXPLOSION = define.define()
+    yellow = pygame.Rect(WIDTH//2-WIDTH//2+SPACESHIP_WIDTH//4,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+    red = pygame.Rect(WIDTH//2+WIDTH//2-SPACESHIP_WIDTH,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+    yellow_bullets = []
+    red_bullets = []
+    yellow_points = 0
+    red_points = 0
+    balls = []
+    ball = pygame.Rect(WIDTH//2-SPACESHIP_WIDTH//6,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH//3,SPACESHIP_HEIGHT//3)
+    balls.append(ball)
+    yellow_health = 20
+    red_health = 20
+    explosions = []
+    dx = WIDTH/960
+    dy = HEIGHT/720
+    yellow_power = MAX_BULLETS
+    red_power = MAX_BULLETS
+    yellow_walls = []
+    red_walls = []
+    toggle = 'red'
+    clock = pygame.time.Clock()
+    run = True
+    import draw_window                                              # imports draw_window
+    import handle_bullets                                           # imports handle_bullet
+    import yellow_handle_movement                                   # imports yellow_handle_movement
+    import red_handle_movement                                      # imports red_handle_move
+    MUSIC.play(-1)
+    while run:
+        clock.tick(FPS)
+        fps2 = clock.get_fps()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_e and yellow_power >= 2:
+                    yellow_power -= 2
+                    bullet = pygame.Rect(yellow.x+yellow.width,yellow.y+yellow.height//2.1,SPACESHIP_WIDTH//2,SPACESHIP_HEIGHT//4)
+                    yellow_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
+                    explosion = pygame.Rect(yellow.x+yellow.width,yellow.y+yellow.height//2.1,SPACESHIP_WIDTH//3,SPACESHIP_HEIGHT//3)
+                    explosions.append(explosion)
+                if event.key == pygame.K_u and red_power >= 2:
+                    red_power -= 2
+                    bullet = pygame.Rect(red.x,red.y+red.height//2.1,SPACESHIP_WIDTH//2,SPACESHIP_HEIGHT//4)
+                    red_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
+                    explosion = pygame.Rect(red.x,red.y+red.height//2.1,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                    explosions.append(explosion)
+                if event.key == pygame.K_q and yellow_power >= 2:
+                    yellow_power -= 2
+                    wall = pygame.Rect(yellow.x+yellow.width,yellow.y,SPACESHIP_WIDTH//8,SPACESHIP_HEIGHT*2)
+                    yellow_walls.append(wall)
+                    SAGE_WALL.play()
+                if event.key == pygame.K_o and red_power >= 2:
+                    red_power -= 2
+                    wall = pygame.Rect(red.x,red.y,SPACESHIP_WIDTH//8,SPACESHIP_HEIGHT*2)
+                    red_walls.append(wall)
+                    SAGE_WALL.play()
+            if event.type == YELLOW_HIT:
+                yellow_health -= 4
+                BULLET_HIT_SOUND.play()
+                explosion = pygame.Rect(yellow.x,yellow.y,SPACESHIP_WIDTH//3,SPACESHIP_HEIGHT//3)
+                explosions.append(explosion)
+            if event.type == RED_HIT:
+                red_health -= 4
+                BULLET_HIT_SOUND.play()
+                explosion = pygame.Rect(red.x,red.y,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                explosions.append(explosion)
+            if event.type == YELLOW_POINT:
+                ROUND_SOUND.play()
+                yellow_points += 1
+                yellow_power = 0
+                red_power = 0
+                yellow_health = 20
+                red_health = 20
+                yellow_bullets = []
+                red_bullets = []
+                yellow_walls = []
+                red_walls = []
+                balls = []
+                ball = pygame.Rect(WIDTH//2-SPACESHIP_WIDTH//6,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH//2,SPACESHIP_HEIGHT//2)
+                balls.append(ball)
+                yellow = pygame.Rect(WIDTH//2-WIDTH//2+SPACESHIP_WIDTH//4,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                red = pygame.Rect(WIDTH//2+WIDTH//2-SPACESHIP_WIDTH,HEIGHT//2+HEIGHT//12,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                draw_window.draw_window(yellow,red,yellow_bullets,red_bullets,yellow_health,red_health,balls,yellow_power,red_power,pygame,yellow_points,red_points,fps2,yellow_walls,red_walls,explosions)
+                temp = handle_bullets.handle_bullets(yellow_bullets,red_bullets,yellow,red,balls,pygame,yellow_walls,red_walls,True)
+                pygame.time.delay(1000)
+                ROUND_SOUND.play()
+            if event.type == RED_POINT:
+                ROUND_SOUND.play()
+                red_points += 1
+                yellow_power = 0
+                red_power = 0
+                yellow_health = 20
+                red_health = 20
+                yellow_bullets = []
+                red_bullets = []
+                yellow_walls = []
+                red_walls = []
+                balls = []
+                ball = pygame.Rect(WIDTH//2-SPACESHIP_WIDTH//6,HEIGHT//2,SPACESHIP_WIDTH//2,SPACESHIP_HEIGHT//2)
+                balls.append(ball)
+                yellow = pygame.Rect(WIDTH//2-WIDTH//2+SPACESHIP_WIDTH//4,HEIGHT//2,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                red = pygame.Rect(WIDTH//2+WIDTH//2-SPACESHIP_WIDTH,HEIGHT//2,SPACESHIP_WIDTH,SPACESHIP_HEIGHT)
+                draw_window.draw_window(yellow,red,yellow_bullets,red_bullets,yellow_health,red_health,balls,yellow_power,red_power,pygame,yellow_points,red_points,fps2,yellow_walls,red_walls,explosions)
+                temp = handle_bullets.handle_bullets(yellow_bullets,red_bullets,yellow,red,balls,pygame,yellow_walls,red_walls,True)
+                pygame.time.delay(1000)
+                ROUND_SOUND.play()
+        winner_text = ''
+        if red_health <= 0:
+            pygame.event.post(pygame.event.Event(YELLOW_POINT))
+        if yellow_health <= 0:
+            pygame.event.post(pygame.event.Event(RED_POINT))
+        if red_points >= 7:
+            winner_text = 'Red Wins!'
+        if yellow_points >= 7:
+            winner_text = 'Yellow Wins!'
+        if winner_text != '':
+            MUSIC.stop()
+            import draw_winner                                      # imports draw_winner
+            draw_winner.draw_winner(winner_text,pygame)
+            break
+        keys_pressed = pygame.key.get_pressed()
+        yellow_handle_movement.yellow_handle_movement(keys_pressed,yellow,pygame)
+        red_handle_movement.red_handle_movement(keys_pressed,red,pygame)
+        temp = handle_bullets.handle_bullets(yellow_bullets,red_bullets,yellow,red,balls,pygame,yellow_walls,red_walls,False)
+        if yellow_power < 20:
+            yellow_power += temp[0]
+        if red_power < 20:
+            red_power += temp[1]
+        draw_window.draw_window(yellow,red,yellow_bullets,red_bullets,yellow_health,red_health,balls,yellow_power,red_power,pygame,yellow_points,red_points,fps2,yellow_walls,red_walls,explosions)
+    main()
+
+if __name__ == "__main__":
+    main()
